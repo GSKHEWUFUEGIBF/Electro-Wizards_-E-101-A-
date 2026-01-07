@@ -45,12 +45,13 @@ const prompt = ai.definePrompt({
   The base pay amount is: {{{basePay}}}
   Outlier Identified: {{{outlierIdentified}}}
 
+  The formula should be in the format: Base Pay + (Feature 1 * Weight 1) + (Feature 2 * Weight 2) + ...
   The formula should clearly show how each feature contributes to the final pay rate. Provide a simple explanation of the formula.
   If outliers were identified, mention that the formula is an estimate and may not be accurate for all cases. Focus on the key factors determining pay.
   Limit the formula explanation to 1-2 short sentences.
 
   Example Output:
-  \"The base pay is calculated as follows: ₹{Base Pay} + (Feature 1 Importance * Feature 1 Value) + (Feature 2 Importance * Feature 2 Value). This formula estimates pay based on the most influential factors.\"`,
+  \"Base Pay = ₹{Base Pay} + (distance_km * 1.5) + (duration_min * 0.2). This formula estimates pay based on the most influential factors, though results may vary due to outliers.\""`,
 });
 
 const generateBasePayFormulaFlow = ai.defineFlow(

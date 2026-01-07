@@ -18,35 +18,35 @@ import {
 import { BarChart3 } from 'lucide-react';
 
 const chartData = [
-  { feature: 'Time of Day', importance: 0.35, fill: 'var(--color-time)' },
-  { feature: 'Distance (km)', importance: 0.28, fill: 'var(--color-distance)' },
-  { feature: 'Weather', importance: 0.18, fill: 'var(--color-weather)' },
-  { feature: 'Area Demand', importance: 0.12, fill: 'var(--color-demand)' },
-  { feature: 'Day of Week', importance: 0.07, fill: 'var(--color-day)' },
+  { feature: 'Distance (km)', importance: 0.45, fill: 'var(--color-distance)' },
+  { feature: 'Duration (min)', importance: 0.25, fill: 'var(--color-duration)' },
+  { feature: 'Experience', importance: 0.15, fill: 'var(--color-experience)' },
+  { feature: 'Surge Active', importance: 0.1, fill: 'var(--color-surge)' },
+  { feature: 'Tasks Today', importance: 0.05, fill: 'var(--color-tasks)' },
 ];
 
 const chartConfig = {
   importance: {
     label: 'Importance',
   },
-  time: {
-    label: 'Time of Day',
-    color: 'hsl(var(--chart-1))',
-  },
   distance: {
     label: 'Distance (km)',
+    color: 'hsl(var(--chart-1))',
+  },
+  duration: {
+    label: 'Duration (min)',
     color: 'hsl(var(--chart-2))',
   },
-  weather: {
-    label: 'Weather',
+  experience: {
+    label: 'Experience',
     color: 'hsl(var(--chart-3))',
   },
-  demand: {
-    label: 'Area Demand',
+  surge: {
+    label: 'Surge Active',
     color: 'hsl(var(--chart-4))',
   },
-  day: {
-    label: 'Day of Week',
+  tasks: {
+    label: 'Tasks Today',
     color: 'hsl(var(--chart-5))',
   },
 } satisfies ChartConfig;
@@ -76,6 +76,7 @@ export function FeatureImportanceCard() {
               axisLine={false}
               tickFormatter={(value) => value}
               className='text-sm'
+              width={100}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Bar dataKey="importance" layout="vertical" radius={5} />
