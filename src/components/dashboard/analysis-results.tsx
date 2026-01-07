@@ -9,6 +9,14 @@ type AnalysisResultsProps = {
 };
 
 export function AnalysisResults({ formulaData }: AnalysisResultsProps) {
+  const featureImportanceData = {
+      featureNames: [
+        'distance_km',
+        'duration_min',
+        'experience_level',
+      ],
+      featureImportances: [0.6, 0.3, 0.1]
+  }
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <div className="lg:col-span-3">
@@ -19,7 +27,7 @@ export function AnalysisResults({ formulaData }: AnalysisResultsProps) {
       </div>
       <div className="flex flex-col gap-6">
         <BasePayFormulaCard formulaData={formulaData} />
-        <ReportCard />
+        <ReportCard featureImportanceData={featureImportanceData}/>
       </div>
     </div>
   );

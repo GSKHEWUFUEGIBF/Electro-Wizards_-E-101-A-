@@ -6,32 +6,43 @@ import { Button } from '@/components/ui/button';
 import { AnalysisResults } from '@/components/dashboard/analysis-results';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { GenerateBasePayFormulaOutput } from '@/ai/flows/generate-base-pay-formula';
+import { generateBasePayFormula } from '@/ai/flows/generate-base-pay-formula';
 
-type AnalysisViewProps = {
-  formulaData: GenerateBasePayFormulaOutput;
-};
-
-export function AnalysisView({ formulaData }: AnalysisViewProps) {
+export function AnalysisView() {
   const [analysisState, setAnalysisState] = useState<
     'idle' | 'analyzing' | 'complete'
   >('idle');
   const [showResults, setShowResults] = useState(false);
+  const [formulaData, setFormulaData] =
+    useState<GenerateBasePayFormulaOutput | null>(null);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (analysisState === 'analyzing') {
-      timer = setTimeout(() => {
-        setAnalysisState('complete');
-      }, 3000);
+      generateBasePayFormula({
+        featureNames: [
+          'distance_km',
+          'duration_min',
+          'experience_level',
+        ],
+        featureImportances: [0.6, 0.3, 0.1],
+        basePay: 5,
+        outlierIdentified: true,
+      }).then((data) => {
+        setFormulaData(data);
+        timer = setTimeout(() => {
+          setAnalysisState('complete');
+        }, 3000);
+      });
     }
     return () => clearTimeout(timer);
   }, [analysisState]);
-  
+
   useEffect(() => {
     if (analysisState === 'complete') {
-        setShowResults(true);
+      setShowResults(true);
     } else {
-        setShowResults(false);
+      setShowResults(false);
     }
   }, [analysisState]);
 
@@ -41,6 +52,7 @@ export function AnalysisView({ formulaData }: AnalysisViewProps) {
 
   const handleReset = () => {
     setAnalysisState('idle');
+    setFormulaData(null);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +99,7 @@ export function AnalysisView({ formulaData }: AnalysisViewProps) {
     );
   }
 
-  if (analysisState === 'analyzing') {
+  if (analysisState === 'analyzing' || !formulaData) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-card p-12 shadow-sm" style={{minHeight: '50vh'}}>
         <Loader2 className="mb-4 h-12 w-12 animate-spin text-primary" />

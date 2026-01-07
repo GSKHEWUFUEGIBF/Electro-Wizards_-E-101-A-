@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,16 +19,35 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { FileDown, Languages, Mail, Loader2 } from 'lucide-react';
-import { getTranslation } from '@/app/actions';
+import { getReportSummary } from '@/app/actions';
 import { Separator } from '../ui/separator';
 
-const originalSummary = "The analysis indicates pay rates are primarily influenced by time of day and distance. Outliers were detected, suggesting some payments deviate significantly from the average. We recommend a review of jobs with unusually low pay-per-kilometer.";
+type ReportCardProps = {
+    featureImportanceData: {
+        featureNames: string[];
+        featureImportances: number[];
+    }
+}
 
-export function ReportCard() {
+export function ReportCard({ featureImportanceData }: ReportCardProps) {
   const { toast } = useToast();
-  const [translatedSummary, setTranslatedSummary] = useState(originalSummary);
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const [summary, setSummary] = useState('');
+  const [isGenerating, setIsGenerating] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState<'English' | 'Tamil' | 'Hindi'>('English');
+
+  useEffect(() => {
+    async function generateInitialSummary() {
+      setIsGenerating(true);
+      const initialSummary = await getReportSummary(
+        featureImportanceData.featureNames,
+        featureImportanceData.featureImportances,
+        'English'
+      );
+      setSummary(initialSummary);
+      setIsGenerating(false);
+    }
+    generateInitialSummary();
+  }, [featureImportanceData]);
 
   const handleExport = (format: string) => {
     toast({
@@ -47,11 +66,15 @@ export function ReportCard() {
   const handleLanguageChange = async (lang: 'English' | 'Tamil' | 'Hindi') => {
     if (lang === selectedLanguage) return;
 
-    setIsTranslating(true);
+    setIsGenerating(true);
     setSelectedLanguage(lang);
-    const translation = await getTranslation(originalSummary, lang);
-    setTranslatedSummary(translation);
-    setIsTranslating(false);
+    const newSummary = await getReportSummary(
+        featureImportanceData.featureNames,
+        featureImportanceData.featureImportances,
+        lang
+    );
+    setSummary(newSummary);
+    setIsGenerating(false);
   };
 
   return (
@@ -69,12 +92,12 @@ export function ReportCard() {
         <div className="space-y-2">
           <p className="text-sm font-medium flex items-center gap-2"><Languages className="h-4 w-4 text-muted-foreground"/> Plain Language Summary</p>
           <div className="relative min-h-[120px] rounded-lg border bg-muted/50 p-3">
-            {isTranslating && (
+            {isGenerating && (
               <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/80">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
             )}
-            <p className="text-sm text-muted-foreground">{translatedSummary}</p>
+            <p className="text-sm text-muted-foreground">{summary}</p>
           </div>
           <Select onValueChange={(value) => handleLanguageChange(value as any)} defaultValue="English">
             <SelectTrigger>
