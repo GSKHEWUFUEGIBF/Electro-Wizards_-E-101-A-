@@ -38,7 +38,7 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are an expert in explaining machine learning models to non-technical users.
 
-  Based on the feature importances from a Random Forest model, generate a human-readable formula for calculating base pay.
+  Based on the feature importances from a Random Forest model, generate a human-readable formula for calculating base pay. The currency is in Rupees (₹), so please prefix the base pay with it.
 
   The feature names are: {{{featureNames}}}
   The feature importances are: {{{featureImportances}}}
@@ -50,7 +50,7 @@ const prompt = ai.definePrompt({
   Limit the formula explanation to 1-2 short sentences.
 
   Example Output:
-  \"The base pay is calculated as follows: Base Pay + (Feature 1 Importance * Feature 1 Value) + (Feature 2 Importance * Feature 2 Value). This formula estimates pay based on the most influential factors.\"`,
+  \"The base pay is calculated as follows: ₹{Base Pay} + (Feature 1 Importance * Feature 1 Value) + (Feature 2 Importance * Feature 2 Value). This formula estimates pay based on the most influential factors.\"`,
 });
 
 const generateBasePayFormulaFlow = ai.defineFlow(

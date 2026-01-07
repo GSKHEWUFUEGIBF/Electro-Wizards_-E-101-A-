@@ -18,21 +18,21 @@ import {
 } from '@/components/ui/chart';
 
 const chartData = [
-  { km: '2', pay: 3.1 },
-  { km: '4', pay: 2.9 },
-  { km: '6', pay: 3.5 },
-  { km: '8', pay: 3.2 },
-  { km: '10', pay: 3.8 },
-  { km: '12', pay: 3.6 },
-  { km: '14', pay: 4.1 },
-  { km: '16', pay: 3.9 },
-  { km: '18', pay: 4.2 },
-  { km: '20', pay: 4.0 },
+  { km: '2', pay: 258.12 },
+  { km: '4', pay: 241.46 },
+  { km: '6', pay: 291.4 },
+  { km: '8', pay: 266.44 },
+  { km: '10', pay: 316.36 },
+  { km: '12', pay: 299.72 },
+  { km: '14', pay: 341.34 },
+  { km: '16', pay: 324.68 },
+  { km: '18', pay: 349.66 },
+  { km: '20', pay: 333.0 },
 ];
 
 const chartConfig = {
   pay: {
-    label: 'Avg. Pay ($)',
+    label: 'Avg. Pay (₹)',
     color: 'hsl(var(--chart-1))',
   },
 } satisfies ChartConfig;
@@ -71,7 +71,7 @@ export function PayPerKmCard() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => `$${value}`}
+              tickFormatter={(value) => `₹${value}`}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
