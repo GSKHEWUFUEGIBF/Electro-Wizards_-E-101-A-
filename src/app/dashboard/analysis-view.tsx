@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { UploadCloud, FileCog, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnalysisResults } from '@/components/dashboard/analysis-results';
@@ -12,42 +12,29 @@ export function AnalysisView() {
   const [analysisState, setAnalysisState] = useState<
     'idle' | 'analyzing' | 'complete'
   >('idle');
-  const [showResults, setShowResults] = useState(false);
   const [formulaData, setFormulaData] =
     useState<GenerateBasePayFormulaOutput | null>(null);
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (analysisState === 'analyzing') {
-      generateBasePayFormula({
-        featureNames: [
-          'distance_km',
-          'duration_min',
-          'experience_level',
-        ],
+  const startAnalysis = async () => {
+    setAnalysisState('analyzing');
+    try {
+      const data = await generateBasePayFormula({
+        featureNames: ['distance_km', 'duration_min', 'experience_level'],
         featureImportances: [0.6, 0.3, 0.1],
         basePay: 5,
         outlierIdentified: true,
-      }).then((data) => {
-        setFormulaData(data);
-        timer = setTimeout(() => {
-          setAnalysisState('complete');
-        }, 3000);
       });
+      setFormulaData(data);
+      setAnalysisState('complete');
+    } catch (error) {
+      console.error("Analysis failed:", error);
+      // Optionally, set an error state here to show in the UI
+      setAnalysisState('idle'); // Reset on error
     }
-    return () => clearTimeout(timer);
-  }, [analysisState]);
-
-  useEffect(() => {
-    if (analysisState === 'complete') {
-      setShowResults(true);
-    } else {
-      setShowResults(false);
-    }
-  }, [analysisState]);
+  };
 
   const handleStartAnalysis = () => {
-    setAnalysisState('analyzing');
+    startAnalysis();
   };
 
   const handleReset = () => {
@@ -57,7 +44,7 @@ export function AnalysisView() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      handleStartAnalysis();
+      startAnalysis();
     }
   };
 
@@ -77,6 +64,7 @@ export function AnalysisView() {
           <div className="flex flex-col items-center gap-6">
             <div className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-card hover:border-primary/50 hover:bg-accent/20">
               <p className="text-muted-foreground">Drag & drop your CSV file here</p>
+
               <p className="text-sm text-muted-foreground">or</p>
               <Button variant="link" asChild className="text-primary">
                 <label htmlFor="file-upload">
@@ -99,7 +87,7 @@ export function AnalysisView() {
     );
   }
 
-  if (analysisState === 'analyzing' || !formulaData) {
+  if (analysisState === 'analyzing' || (analysisState === 'complete' && !formulaData)) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-card p-12 shadow-sm" style={{minHeight: '50vh'}}>
         <Loader2 className="mb-4 h-12 w-12 animate-spin text-primary" />
@@ -111,7 +99,7 @@ export function AnalysisView() {
     );
   }
 
-  if (analysisState === 'complete') {
+  if (analysisState === 'complete' && formulaData) {
     return (
       <div className="animate-in fade-in duration-500">
         <div className="mb-6 flex items-center justify-between">
