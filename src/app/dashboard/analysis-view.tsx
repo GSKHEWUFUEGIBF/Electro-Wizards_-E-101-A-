@@ -5,8 +5,13 @@ import { UploadCloud, FileCog, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnalysisResults } from '@/components/dashboard/analysis-results';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import type { GenerateBasePayFormulaOutput } from '@/ai/flows/generate-base-pay-formula';
 
-export function AnalysisView() {
+type AnalysisViewProps = {
+  formulaData: GenerateBasePayFormulaOutput;
+};
+
+export function AnalysisView({ formulaData }: AnalysisViewProps) {
   const [analysisState, setAnalysisState] = useState<
     'idle' | 'analyzing' | 'complete'
   >('idle');
@@ -97,7 +102,7 @@ export function AnalysisView() {
             Start New Analysis
           </Button>
         </div>
-        <AnalysisResults />
+        <AnalysisResults formulaData={formulaData} />
       </div>
     );
   }

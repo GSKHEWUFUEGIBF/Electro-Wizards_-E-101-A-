@@ -1,4 +1,3 @@
-import { generateBasePayFormula } from '@/ai/flows/generate-base-pay-formula';
 import {
   Card,
   CardContent,
@@ -8,15 +7,13 @@ import {
 } from '@/components/ui/card';
 import { Calculator, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { GenerateBasePayFormulaOutput } from '@/ai/flows/generate-base-pay-formula';
 
-export async function BasePayFormulaCard() {
-  const formulaData = await generateBasePayFormula({
-    featureNames: ['Time of Day', 'Distance (km)', 'Weather'],
-    featureImportances: [0.35, 0.28, 0.18],
-    basePay: 15.5,
-    outlierIdentified: true,
-  });
+type BasePayFormulaCardProps = {
+  formulaData: GenerateBasePayFormulaOutput;
+};
 
+export function BasePayFormulaCard({ formulaData }: BasePayFormulaCardProps) {
   return (
     <Card>
       <CardHeader>
