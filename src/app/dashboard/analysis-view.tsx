@@ -43,6 +43,12 @@ export function AnalysisView({ formulaData }: AnalysisViewProps) {
     setAnalysisState('idle');
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      handleStartAnalysis();
+    }
+  };
+
   if (analysisState === 'idle') {
     return (
       <Card className="mx-auto max-w-2xl text-center">
@@ -63,7 +69,7 @@ export function AnalysisView({ formulaData }: AnalysisViewProps) {
               <Button variant="link" asChild className="text-primary">
                 <label htmlFor="file-upload">
                   Browse files
-                  <input id="file-upload" type="file" className="sr-only" accept=".csv" />
+                  <input id="file-upload" type="file" className="sr-only" accept=".csv" onChange={handleFileChange} />
                 </label>
               </Button>
             </div>
