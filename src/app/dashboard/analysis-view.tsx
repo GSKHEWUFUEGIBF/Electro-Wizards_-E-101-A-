@@ -1,19 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { UploadCloud, FileCog, Loader2 } from 'lucide-react';
+import { UploadCloud, FileCog, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnalysisResults } from '@/components/dashboard/analysis-results';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { GenerateBasePayFormulaOutput } from '@/ai/flows/generate-base-pay-formula';
 import { generateBasePayFormula } from '@/ai/flows/generate-base-pay-formula';
+import { useToast } from '@/hooks/use-toast';
 
 export function AnalysisView() {
   const [analysisState, setAnalysisState] = useState<
-    'idle' | 'analyzing' | 'complete'
+    'idle' | 'analyzing' | 'complete' | 'error'
   >('idle');
   const [formulaData, setFormulaData] =
     useState<GenerateBasePayFormulaOutput | null>(null);
+  const { toast } = useToast();
 
   const startAnalysis = async () => {
     setAnalysisState('analyzing');
@@ -21,15 +23,19 @@ export function AnalysisView() {
       const data = await generateBasePayFormula({
         featureNames: ['distance_km', 'duration_min', 'experience_level'],
         featureImportances: [0.6, 0.3, 0.1],
-        basePay: 5,
+        basePay: 50,
         outlierIdentified: true,
       });
       setFormulaData(data);
       setAnalysisState('complete');
     } catch (error) {
       console.error("Analysis failed:", error);
-      // Optionally, set an error state here to show in the UI
-      setAnalysisState('idle'); // Reset on error
+      setAnalysisState('error');
+      toast({
+        variant: "destructive",
+        title: "Analysis Failed",
+        description: "There was a problem analyzing your data. Please try again.",
+      });
     }
   };
 
@@ -41,23 +47,27 @@ export function AnalysisView() {
     setAnalysisState('idle');
     setFormulaData(null);
   };
-
+  
+  // This function is no longer triggering the analysis to prevent multiple API calls.
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      startAnalysis();
+      toast({
+        title: "File selected",
+        description: `Ready to analyze ${event.target.files[0].name}. Click 'Analyze Pay' to start.`,
+      });
     }
   };
 
-  if (analysisState === 'idle') {
+  if (analysisState === 'idle' || analysisState === 'error') {
     return (
       <Card className="mx-auto max-w-2xl text-center">
         <CardHeader>
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <UploadCloud className="h-8 w-8" />
+            {analysisState === 'error' ? <AlertCircle className="h-8 w-8 text-destructive" /> : <UploadCloud className="h-8 w-8" />}
           </div>
-          <CardTitle>Upload Your Dataset</CardTitle>
+          <CardTitle>{analysisState === 'error' ? 'Analysis Failed' : 'Upload Your Dataset'}</CardTitle>
           <CardDescription>
-            Upload a CSV file with gig work data to analyze pay rates and ensure fairness.
+            {analysisState === 'error' ? 'Something went wrong. Please try again.' : 'Upload a CSV file with gig work data to analyze pay rates and ensure fairness.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -79,7 +89,7 @@ export function AnalysisView() {
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
               <FileCog className="mr-2 h-5 w-5" />
-              Analyze Pay
+              {analysisState === 'error' ? 'Try Again' : 'Analyze Pay'}
             </Button>
           </div>
         </CardContent>
